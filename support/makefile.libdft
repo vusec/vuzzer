@@ -1,0 +1,21 @@
+include makefile.vars
+
+LIBDFT_SRC			= libdft/src
+#LIBDFT_TAG_FLAGS	?= -DLIBDFT_TAG_TYPE=libdft_tag_set_fdoff						# fdset offset tags
+#LIBDFT_TAG_FLAGS	?= "-DLIBDFT_TAG_TYPE=libdft_tag_bitset -DTAG_BITSET_SIZE=32"	# bitset tags
+#LIBDFT_TAG_FLAGS	?= -DLIBDFT_TAG_TYPE=libdft_tag_bvector						# bvector offset tags
+LIBDFT_TAG_FLAGS	?= -DLIBDFT_TAG_TYPE=libdft_tag_ewah						# ewah offset tags
+CPPFLAGS			+= $(LIBDFT_TAG_FLAGS)
+
+.PHONY: all
+all: libdft
+
+.PHONY: libdft
+libdft: $(LIBDFT_SRC)
+	cd $< && CPPFLAGS=$(CPPFLAGS) make
+
+.PHONY: clean
+clean: $(LIBDFT_SRC)
+	cd $< && make clean
+
+# vim: ai:ts=4:sw=4:et!:ft=make

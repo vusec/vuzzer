@@ -1,0 +1,31 @@
+include makefile.vars
+
+PIN_TARBALL=$(notdir $(PIN_TARBALL_URL))
+PIN_BASEDIR=$(basename $(basename $(PIN_TARBALL)))
+
+ifdef PIN_ROOT
+$(info ## $$PIN_ROOT is set to $(PIN_ROOT). Skipping Pin installation.)
+ALL_TARGETS=
+else
+ALL_TARGETS=../pin
+endif
+
+.PHONY: all
+
+all: $(ALL_TARGETS)
+
+../pin: $(PIN_BASEDIR)
+	$(LN) -sf support/$(PIN_BASEDIR) ../pin
+
+$(PIN_BASEDIR): $(PIN_TARBALL)
+	@[ -d $@ ] || $(TAR) -zxvf $(PIN_TARBALL)
+
+$(PIN_TARBALL):
+	$(WGET) $(PIN_TARBALL_URL) -O $@
+
+.PHONY: clean
+clean:
+	$(RM) -rf $(PIN_TARBALL) $(PIN_BASEDIR) 
+	[ -L ../pin ] && $(RM) -f ../pin
+
+# vim: ai:ts=4:sw=4:et!:ft=make

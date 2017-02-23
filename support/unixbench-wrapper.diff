@@ -1,0 +1,40 @@
+commit dc72e99cc967e01458263931ab50683f8e3d9fd1
+Author: Manolis Stamatogiannakis <manolis.stamatogiannakis@vu.nl>
+Date:   Fri Feb 19 09:36:48 2016 +0100
+
+    Wrapper for DataTracker.
+
+diff --git a/UnixBench/Run b/UnixBench/Run
+index d615935..00c6883 100755
+--- a/UnixBench/Run
++++ b/UnixBench/Run
+@@ -5,6 +5,8 @@ use strict;
+ use POSIX qw(strftime);
+ use Time::HiRes;
+ use IO::Handle;
++use File::Basename;
++use Cwd qw(abs_path);
+ 
+ 
+ ############################################################################
+@@ -524,6 +526,20 @@ my $x86CpuFlags = {
+ sub command {
+     my ( $cmd ) = @_;
+ 
++    my $binary = (split /\"/, $cmd)[1];
++    if ($binary) {
++      my($bin_file, $bin_dir, $bin_suffix) = fileparse($binary);
++      if (basename($bin_dir) eq "pgms") {
++         my $dtdl = abs_path(dirname($bin_dir) . "/../../../obj-ia32/dtracker.so");
++         my $provout = $bin_file . ".out";
++
++         my $dtwrap_fmt = "pin.sh -follow_execv -t %s -o %s -stdin %d -stdout %d -stderr %d -- %s";
++         my $dtwrap = sprintf($dtwrap_fmt, $dtdl, $provout, 1, 1, 1, $cmd);
++
++         $cmd = $dtwrap;
++      }
++   }
++
+     my $pid = open(my $childFd, "-|");
+     if (!defined($pid)) {
+         die("Run: fork() failed (undef)\n");

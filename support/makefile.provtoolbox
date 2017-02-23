@@ -1,0 +1,19 @@
+include makefile.vars
+
+PROVTOOLBOX_TARBALL=$(notdir $(PROVTOOLBOX_TARBALL_URL))
+PROVTOOLBOX_BASEDIR=provToolbox
+
+.PHONY: all
+all: $(PROVTOOLBOX_BASEDIR)
+
+$(PROVTOOLBOX_BASEDIR): $(PROVTOOLBOX_TARBALL)
+	@[ -d $@ ] || $(UNZIP) $(PROVTOOLBOX_TARBALL) && chmod -R 'go-w' $@
+
+$(PROVTOOLBOX_TARBALL):
+	$(WGET) $(PROVTOOLBOX_TARBALL_URL) -O $@
+
+.PHONY: clean
+clean:
+	$(RM) -rf $(PROVTOOLBOX_TARBALL) $(PROVTOOLBOX_BASEDIR) 
+
+# vim: ai:ts=4:sw=4:et!:ft=make
