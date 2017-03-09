@@ -32,7 +32,7 @@ Installation
 -------------
 First do `cd vuzzer` and then
 ```
-export PIN_ROOT=($pwd)/pin
+export PIN_ROOT=$(pwd)/pin
 ```
 If initially libdft has been made then go to support/libdft/src and do `make clean`
 Again in the parent folder execute following
