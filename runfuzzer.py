@@ -587,6 +587,8 @@ def main():
     config.LIBPICKLE=[w for w in args.weight.split(',')]
     config.NAMESPICKLE=[n for n in args.name.split(',')]
     config.LIBOFFSETS=[o for o in args.offsets.split(',')]
+    ih=config.PINCMD.index("#") # this is just to find the index of the placeholder in PINCMD list to replace it with the libname
+    config.PINCMD[ih]=args.libname
 
 
     ###################################
