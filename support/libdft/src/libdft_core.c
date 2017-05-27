@@ -2006,7 +2006,7 @@ _xadd_r2r_opw(thread_ctx_t *thread_ctx, uint32_t dst, uint32_t src)
  * @src:	source memory address
  */
 static void PIN_FAST_ANALYSIS_CALL
-_xadd_m2r_opb_u(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
+_xadd_m2r_opb_u(thread_ctx_t *thread_ctx, uint32_t src, ADDRINT dst)
 {
 #ifndef USE_CUSTOM_TAG
 	/* temporary tag value */
@@ -2022,11 +2022,11 @@ _xadd_m2r_opb_u(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
 		(bitmap[VIRT2BYTE(src)] & ~(BYTE_MASK << VIRT2BIT(src))) |
 		((tmp_tag >> 1) << VIRT2BIT(src));
 #else
-    tag_t dst_tag = thread_ctx->vcpu.gpr[dst][1];
-    tag_t src_tag = tag_dir_getb(tag_dir, src);
+    tag_t src_tag = thread_ctx->vcpu.gpr[src][1];
+    tag_t dst_tag = tag_dir_getb(tag_dir, dst);
 
-    thread_ctx->vcpu.gpr[dst][1] = tag_combine(dst_tag, src_tag);
-    tag_dir_setb(tag_dir, src, dst_tag);
+    thread_ctx->vcpu.gpr[src][1] = dst_tag;
+    tag_dir_setb(tag_dir, dst, tag_combine(dst_tag, src_tag));
 #endif
 }
 
@@ -2045,7 +2045,7 @@ _xadd_m2r_opb_u(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
  * @src:	source memory address
  */
 static void PIN_FAST_ANALYSIS_CALL
-_xadd_m2r_opb_l(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
+_xadd_m2r_opb_l(thread_ctx_t *thread_ctx, uint32_t src, ADDRINT dst)
 {
 #ifndef USE_CUSTOM_TAG
 	/* temporary tag value */
@@ -2060,11 +2060,11 @@ _xadd_m2r_opb_l(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
 		(bitmap[VIRT2BYTE(src)] & ~(BYTE_MASK << VIRT2BIT(src))) |
 		(tmp_tag << VIRT2BIT(src));
 #else
-    tag_t dst_tag = thread_ctx->vcpu.gpr[dst][0];
-    tag_t src_tag = tag_dir_getb(tag_dir, src);
+    tag_t src_tag = thread_ctx->vcpu.gpr[src][0];
+    tag_t dst_tag = tag_dir_getb(tag_dir, dst);
 
-    thread_ctx->vcpu.gpr[dst][0] = tag_combine(dst_tag, src_tag);
-    tag_dir_setb(tag_dir, src, dst_tag);
+    thread_ctx->vcpu.gpr[src][0] = dst_tag;
+    tag_dir_setb(tag_dir, dst, tag_combine(dst_tag, src_tag));
 #endif
 }
 
@@ -2083,7 +2083,7 @@ _xadd_m2r_opb_l(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
  * @src:	source memory address
  */
 static void PIN_FAST_ANALYSIS_CALL
-_xadd_m2r_opw(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
+_xadd_m2r_opw(thread_ctx_t *thread_ctx, uint32_t src, ADDRINT dst)
 {
 #ifndef USE_CUSTOM_TAG
 	/* temporary tag value */
@@ -2100,14 +2100,14 @@ _xadd_m2r_opw(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
 							      VIRT2BIT(src))) |
 		((uint16_t)(tmp_tag) < VIRT2BIT(src));
 #else
-    tag_t dst_tag[] = {thread_ctx->vcpu.gpr[dst][0], thread_ctx->vcpu.gpr[dst][1]};
-    tag_t src_tag[] = {tag_dir_getb(tag_dir, src), tag_dir_getb(tag_dir, src+1)};
+    tag_t src_tag[] = {thread_ctx->vcpu.gpr[src][0], thread_ctx->vcpu.gpr[src][1]};
+    tag_t dst_tag[] = {tag_dir_getb(tag_dir, dst), tag_dir_getb(tag_dir, dst+1)};
 
-    thread_ctx->vcpu.gpr[dst][0] = tag_combine(dst_tag[0], src_tag[0]);
-    thread_ctx->vcpu.gpr[dst][1] = tag_combine(dst_tag[1], src_tag[1]);
+    thread_ctx->vcpu.gpr[src][0] = dst_tag[0];
+    thread_ctx->vcpu.gpr[src][1] = dst_tag[1];
 
-    tag_dir_setb(tag_dir, src, dst_tag[0]);
-    tag_dir_setb(tag_dir, src+1, dst_tag[1]);
+    tag_dir_setb(tag_dir, dst, tag_combine(dst_tag[0], src_tag[0]));
+    tag_dir_setb(tag_dir, dst+1, tag_combine(dst_tag[1], src_tag[1]));
 #endif
 }
 
@@ -2126,7 +2126,7 @@ _xadd_m2r_opw(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
  * @src:	source memory address
  */
 static void PIN_FAST_ANALYSIS_CALL
-_xadd_m2r_opl(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
+_xadd_m2r_opl(thread_ctx_t *thread_ctx, uint32_t src, ADDRINT dst)
 {
 #ifndef USE_CUSTOM_TAG
 	/* temporary tag value */
@@ -2142,20 +2142,20 @@ _xadd_m2r_opl(thread_ctx_t *thread_ctx, uint32_t dst, ADDRINT src)
 							      VIRT2BIT(src))) |
 		((uint16_t)(tmp_tag) << VIRT2BIT(src));
 #else
-    tag_t dst_tag[] = {thread_ctx->vcpu.gpr[dst][0], thread_ctx->vcpu.gpr[dst][1], 
-        thread_ctx->vcpu.gpr[dst][2], thread_ctx->vcpu.gpr[dst][3]};
-    tag_t src_tag[] = {tag_dir_getb(tag_dir, src), tag_dir_getb(tag_dir, src+1),
-        tag_dir_getb(tag_dir, src+2), tag_dir_getb(tag_dir, src+3)};
+    tag_t src_tag[] = {thread_ctx->vcpu.gpr[src][0], thread_ctx->vcpu.gpr[src][1], 
+        thread_ctx->vcpu.gpr[src][2], thread_ctx->vcpu.gpr[src][3]};
+    tag_t dst_tag[] = {tag_dir_getb(tag_dir, dst), tag_dir_getb(tag_dir, dst+1),
+        tag_dir_getb(tag_dir, dst+2), tag_dir_getb(tag_dir, dst+3)};
 
-    thread_ctx->vcpu.gpr[dst][0] = tag_combine(dst_tag[0], src_tag[0]);
-    thread_ctx->vcpu.gpr[dst][1] = tag_combine(dst_tag[1], src_tag[1]);
-    thread_ctx->vcpu.gpr[dst][2] = tag_combine(dst_tag[2], src_tag[2]);
-    thread_ctx->vcpu.gpr[dst][3] = tag_combine(dst_tag[3], src_tag[3]);
+    thread_ctx->vcpu.gpr[src][0] = dst_tag[0];
+    thread_ctx->vcpu.gpr[src][1] = dst_tag[1];
+    thread_ctx->vcpu.gpr[src][2] = dst_tag[2];
+    thread_ctx->vcpu.gpr[src][3] = dst_tag[3];
 
-    tag_dir_setb(tag_dir, src, dst_tag[0]);
-    tag_dir_setb(tag_dir, src+1, dst_tag[1]);
-    tag_dir_setb(tag_dir, src+2, dst_tag[2]);
-    tag_dir_setb(tag_dir, src+3, dst_tag[3]);
+    tag_dir_setb(tag_dir, dst, tag_combine(dst_tag[0], src_tag[0]));
+    tag_dir_setb(tag_dir, dst+1, tag_combine(dst_tag[1], src_tag[1]));
+    tag_dir_setb(tag_dir, dst+2, tag_combine(dst_tag[2], src_tag[2]));
+    tag_dir_setb(tag_dir, dst+3, tag_combine(dst_tag[3], src_tag[3]));
 #endif
 }
 
