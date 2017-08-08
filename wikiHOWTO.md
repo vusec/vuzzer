@@ -6,6 +6,10 @@ This is an early (and uncleaned!) release of the tool. Please excuse us. The nex
 - For static analysis component, perform the analysis using some open-source tool, like angr or miasm. Currently, it is done using IDA.
 - A cleaner code!
 
+
+ADDED: An improved algorithm for calculating BB weights is implemented in the file "bb-weight-new.py". Please use that to get more precise information. However, it takes longer to compute the weights (specially for larger/complex code). 
+
+
 ## A step-by-step guide to run VUzzer: 
 Some acronyms:
 - BB: basib-block
@@ -46,7 +50,7 @@ Linux ubuntu 3.13.0-91-generic #138-Ubuntu SMP Fri Jun 24 15:58:13 UTC 2016 i686
  
  `-i` (seed input directory (relative path)): `"datatemp/utmp/"`. this directory contains seed inputs that are used to start fuzzing. For each SUT, we should create a folder in datatemp directory and copy 4 (min) seed files. The size of the file matters a lot, so try using files of size less than 20 kb (upper limit is for cases like media files). 
  
- `-w` (path of the pickle file(s) for BB wieghts (separated by comma in case there are two): `"idafiles/who.pkl"`. This is the step that depends on IDA. The binary that we want to fuzz (who, in this case) is opened in IDA and we run the idapython based script *BB-weightv4.py* within IDA. This step creates two separate pickle files: who.pkl and who.names. Copy these files to some location. Defaulat location is idafiles/ folder. If we also want to monitor a dynamic library used by SUT, we also repeat the above process for the library. And in this case, we need to supply two files for this option, i.e. `-w "idafiles/who.pkl,idafiles/lib.pkl"`, assuming name of the dynamic library is `lib.so`. 
+ `-w` (path of the pickle file(s) for BB wieghts (separated by comma in case there are two): `"idafiles/who.pkl"`. This is the step that depends on IDA. The binary that we want to fuzz (who, in this case) is opened in IDA and we run the idapython based script *BB-weightv4.py* within IDA. This step creates two separate pickle files: who.pkl and who.names. Copy these files to some location. Defaulat location is idafiles/ folder. If we also want to monitor a dynamic library used by SUT, we also repeat the above process for the library. And in this case, we need to supply two files for this option, i.e. `-w "idafiles/who.pkl,idafiles/lib.pkl"`, assuming name of the dynamic library is `lib.so`. An improved algorithm for calculating BB weights is implemented in the file "bb-weight-new.py". Please use that to get more precise information. However, it takes longer to compute the weights (specially for larger/complex code). 
  
  `-n` (Path of the pickle file(s) containing strings from `CMP` inst (separated by comma if there are two)): `-n "idafiles/who.names"`. As we mentioned above, *BB-weightv4.py* creates two files and in this option, we supply the second file with `.names` extn. If there is a library to monitor, we supply its .name file also as `-n "idafiles/who.names,idafiles/lib.names"`.
  
