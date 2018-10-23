@@ -1,3 +1,7 @@
+ :point_right: VUzzer 64-bit is available at:<br/>
+ https://github.com/vusec/vuzzer64
+==========
+
 VUzzer
 ===========
 
