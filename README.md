@@ -12,6 +12,8 @@ This Project depends heavily on a  modeified version of DataTracker, which in tu
 #### Running the VUzzer:
 Please see wikiHOWTO.md for a step-by-step procedure to run the VUzzer. This file also contains explanation for most of the options.
 
+:point_right: **NOTE: VUzzer's taintflow analysis does not work on binaries compiled with sanitizers pass (e.g. address sanitizer). Therefore, do not involve VUzzer in an experiment where sanitizer enabled binaries are used.**
+
 
 Requirements
 -------------
